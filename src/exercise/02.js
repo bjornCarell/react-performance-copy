@@ -60,8 +60,10 @@ function App() {
   const forceRerender = useForceRerender()
   const [inputValue, setInputValue] = React.useState('')
 
-  // 🐨 wrap getItems in a call to `React.useMemo`
-  const allItems = getItems(inputValue)
+  // Only re-render when inputValue changes - [inpuValue] dependency. 
+  const allItems = React.useMemo(() => getItems(inputValue), [inputValue])
+  /* switch between allItems and explore the Performance tab in dev tools*/
+  // const allItems = getItems(inputValue)
   const items = allItems.slice(0, 100)
 
   const {
