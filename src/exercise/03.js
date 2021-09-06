@@ -5,6 +5,7 @@ import * as React from 'react'
 import {useCombobox} from '../use-combobox'
 import {getItems} from '../workerized-filter-cities'
 import {useAsync, useForceRerender} from '../utils'
+import {truncate} from 'lodash'
 
 function Menu({
   items,
@@ -31,6 +32,7 @@ function Menu({
   )
 }
 // 🐨 Memoize the Menu here using React.memo
+Menu = React.memo(Menu)
 
 function ListItem({
   getItemProps,
@@ -56,7 +58,16 @@ function ListItem({
     />
   )
 }
+
+// https://reactjs.org/docs/react-api.html#reactmemo
+function areEqual(prevProps, nextProps) {
+  if (nextProps.highlightedIndex === prevProps.index) return false
+  if (prevProps.highlightedIndex === nextProps.index) return false
+
+  return true
+}
 // 🐨 Memoize the ListItem here using React.memo
+ListItem = React.memo(ListItem, areEqual)
 
 function App() {
   const forceRerender = useForceRerender()
