@@ -5,7 +5,6 @@ import * as React from 'react'
 import {useCombobox} from '../use-combobox'
 import {getItems} from '../workerized-filter-cities'
 import {useAsync, useForceRerender} from '../utils'
-import {truncate} from 'lodash'
 
 function Menu({
   items,
@@ -22,8 +21,12 @@ function Menu({
           getItemProps={getItemProps}
           item={item}
           index={index}
-          selectedItem={selectedItem}
-          highlightedIndex={highlightedIndex}
+          /* selectedItem={selectedItem} */
+          /* highlightedIndex={highlightedIndex} */
+          // Like this, isSelected and isHighlighted
+          // is passed down with props as primitive values
+          isSelected={selectedItem?.id === item.id}
+          isHighlighted={highlightedIndex === index}
         >
           {item.name}
         </ListItem>
@@ -31,19 +34,21 @@ function Menu({
     </ul>
   )
 }
-// 🐨 Memoize the Menu here using React.memo
 Menu = React.memo(Menu)
 
 function ListItem({
   getItemProps,
   item,
   index,
-  selectedItem,
-  highlightedIndex,
+  /* selectedItem, */
+  /* highlightedIndex, */
+  isSelected,
+  isHighlighted,
   ...props
 }) {
-  const isSelected = selectedItem?.id === item.id
-  const isHighlighted = highlightedIndex === index
+  // const isSlected = selectedItem?.id === item.id
+  // const isHighlighted = highlightedIndex === index
+
   return (
     <li
       {...getItemProps({
@@ -66,8 +71,12 @@ function areEqual(prevProps, nextProps) {
 
   return true
 }
-// 🐨 Memoize the ListItem here using React.memo
-ListItem = React.memo(ListItem, areEqual)
+// Passing isSelected and isHiglighted as props let us 
+// remove the use of areEqueal
+
+// Play around with memo
+// Check the different affects in Profiler in React dev tools
+ListItem = React.memo(ListItem, /* areEqual */ )
 
 function App() {
   const forceRerender = useForceRerender()
