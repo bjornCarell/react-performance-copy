@@ -38,14 +38,20 @@ function AppProvider({children}) {
     dogName: '',
     grid: initialGrid,
   })
-  // 🐨 memoize this value with React.useMemo
-  const value = [state, dispatch]
+  const value = React.useMemo(() => [state, dispatch], [state])
   return (
     <AppStateContext.Provider value={value}>
       {children}
     </AppStateContext.Provider>
   )
 }
+// By memoizing the value that is returned by our context provider
+// it's consumers will not only re-render when the state actually changes 
+// Why does the consumers otherwise re-render even though the state has
+// not changed? Because React uses Object.is to compare the previous 
+// value with current. If our state is a object, that will always be read
+// as new value, since Object === Object always is false in JavaScript
+// const value = [state, dispatch]
 
 function useAppState() {
   const context = React.useContext(AppStateContext)
