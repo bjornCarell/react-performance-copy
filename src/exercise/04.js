@@ -53,6 +53,11 @@ function Menu({
             isSelected={selectedItem?.id === item.id}
             isHighlighted={highlightedIndex === index}
             style={getVirtualRowStyles({size, start})}
+            // We need to position each ListItem absolute for it's position
+            // to take higher order than the  <li style={{height: totalHeight}}/>
+            // in our ul list in the Menu component. 
+            // Otherwise our items will be at the bottom of the list, 
+            // positioned after our li with totalHeight style
           >
             {item.name}
           </ListItem>
@@ -105,9 +110,13 @@ function App() {
 
   // userVirtual Hook
   const rowVirtualizer = useVirtual({
+    // know the size of our list
     size: items.length,
+    // have access to the scrollable items of that list
     parentRef: listRef,
+    // know what the size of those scrollable items should be
     estimateSize: React.useCallback(() => 20, []),
+    // and know hoe much before and after out list we should render
     overscan: 10,
   })
 
