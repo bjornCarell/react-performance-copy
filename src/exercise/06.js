@@ -12,6 +12,7 @@ import {
 
 const AppStateContext = React.createContext()
 const AppDispatchContext = React.createContext()
+const DogNameInputContext = React.createContext()
 
 const initialGrid = Array.from({length: 100}, () =>
   Array.from({length: 100}, () => Math.random() * 100),
@@ -44,21 +45,27 @@ function AppProvider({children}) {
   )
 }
 
-function useAppState() {
-  const context = React.useContext(AppStateContext)
+function DogNameInputProvider({children}) {
+  const [dogName, setDogName] = React.useState('')
+  const value = [dogName, setDogName]
+  return (
+    <DogNameInputContext.Provider value={value}>
+      {children}
+    </DogNameInputContext.Provider>
+  )
+}
+
+function useAnyContext(contextInput = null) {
+  const context = React.useContext(contextInput)
   if (!context) {
-    throw new Error('useAppState must be used within the AppProvider')
+    throw new Error('useAnyContext must be used within a Provider')
   }
   return context
 }
 
-function useAppDispatch() {
-  const context = React.useContext(AppDispatchContext)
-  if (!context) {
-    throw new Error('useAppDispatch must be used within the AppProvider')
-  }
-  return context
-}
+const useAppState = () => useAnyContext(AppStateContext)
+const useAppDispatch = () => useAnyContext(AppDispatchContext)
+const useDogInput = () => useAnyContext(DogNameInputContext)
 
 function Grid() {
   const dispatch = useAppDispatch()
@@ -99,8 +106,7 @@ function Cell({row, column}) {
 Cell = React.memo(Cell)
 
 function DogNameInput() {
-  const [dogName, setDogName] = React.useState('')
-
+  const [dogName, setDogName] = useDogInput()
   function handleChange(event) {
     const newDogName = event.target.value
     setDogName(newDogName)
@@ -128,12 +134,15 @@ function App() {
   return (
     <div className="grid-app">
       <button onClick={forceRerender}>force rerender</button>
-      <AppProvider>
-        <div>
-          <DogNameInput />
-          <Grid />
+      <div>
+        {/* Colocate state from Context Providers*/}
+          <DogNameInputProvider>
+            <DogNameInput />
+          </DogNameInputProvider>
+          <AppProvider>
+            <Grid />
+          </AppProvider>
         </div>
-      </AppProvider>
     </div>
   )
 }
