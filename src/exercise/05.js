@@ -11,6 +11,7 @@ import {
 } from '../utils'
 
 const AppStateContext = React.createContext()
+const AppDispatchContext = React.createContext()
 
 const initialGrid = Array.from({length: 100}, () =>
   Array.from({length: 100}, () => Math.random() * 100),
@@ -36,33 +37,51 @@ function appReducer(state, action) {
 function AppProvider({children}) {
   const [state, dispatch] = React.useReducer(appReducer, {
     dogName: '',
-    grid: initialGrid,
+    grid: initialGrid
   })
-  const value = React.useMemo(() => [state, dispatch], [state])
+
+  // If many of our components, or one component that causes 
+  // many DOM objects to re-render, is dependent on just one of
+  // dispatch or state, this solution makes sense.
   return (
-    <AppStateContext.Provider value={value}>
-      {children}
+    <AppStateContext.Provider value={state}>
+      <AppDispatchContext.Provider value={dispatch}>
+        {children}
+      </AppDispatchContext.Provider>
     </AppStateContext.Provider>
   )
 }
-// By memoizing the value that is returned by our context provider
-// it's consumers will not only re-render when the state actually changes 
-// Why does the consumers otherwise re-render even though the state has
-// not changed? Because React uses Object.is to compare the previous 
-// value with current. If our state is a object, that will always be read
-// as new value, since Object === Object always is false in JavaScript
-// const value = [state, dispatch]
 
-function useAppState() {
-  const context = React.useContext(AppStateContext)
+/* 
+  By memoizing the value that is returned by our context provider,
+  it's consumers will not only re-render when the state actually changes. 
+  Why does the consumers otherwise re-render even though the state has
+  not changed? Because React uses Object.is to compare the previous 
+  value with current. If our state is an object, that will always be read
+  as a new value, since Object === Object always is false in JavaScript
+
+  const value = React.useMemo(() => [state, dispatch], [state])
+    return (
+      <AppStateContext.Provider value={value}>
+        {children}
+      </AppStateContext.Provider>
+    )
+*/
+
+function useAnyContext(inputContext) {
+  const context = React.useContext(inputContext)
   if (!context) {
-    throw new Error('useAppState must be used within the AppProvider')
+    throw new Error('useAnyContext must be used within a Provider')
   }
+
   return context
 }
 
+const useAppState = () => useAnyContext(AppStateContext)
+const useAppDispatch = () => useAnyContext(AppDispatchContext)
+
 function Grid() {
-  const [, dispatch] = useAppState()
+  const dispatch = useAppDispatch()
   const [rows, setRows] = useDebouncedState(50)
   const [columns, setColumns] = useDebouncedState(50)
   const updateGridData = () => dispatch({type: 'UPDATE_GRID'})
@@ -80,7 +99,8 @@ function Grid() {
 Grid = React.memo(Grid)
 
 function Cell({row, column}) {
-  const [state, dispatch] = useAppState()
+  const state = useAppState()
+  const dispatch = useAppDispatch()
   const cell = state.grid[row][column]
   const handleClick = () => dispatch({type: 'UPDATE_GRID_CELL', row, column})
   return (
@@ -99,7 +119,8 @@ function Cell({row, column}) {
 Cell = React.memo(Cell)
 
 function DogNameInput() {
-  const [state, dispatch] = useAppState()
+  const state = useAppState()
+  const dispatch = useAppDispatch()
   const {dogName} = state
 
   function handleChange(event) {
