@@ -71,12 +71,12 @@ function areEqual(prevProps, nextProps) {
 
   return true
 }
-// Passing isSelected and isHiglighted as props let us 
+// Passing isSelected and isHiglighted as props let us
 // remove the use of areEqueal
 
 // Play around with memo
 // Check the different affects in Profiler in React dev tools
-ListItem = React.memo(ListItem, /* areEqual */ )
+ListItem = React.memo(ListItem /* areEqual */)
 
 function App() {
   const forceRerender = useForceRerender()

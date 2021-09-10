@@ -37,10 +37,10 @@ function appReducer(state, action) {
 function AppProvider({children}) {
   const [state, dispatch] = React.useReducer(appReducer, {
     dogName: '',
-    grid: initialGrid
+    grid: initialGrid,
   })
 
-  // If many of our components, or one component that causes 
+  // If many of our components, or one component that causes
   // many DOM objects to re-render, is dependent on just one of
   // dispatch or state, this solution makes sense.
   return (

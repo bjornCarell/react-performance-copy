@@ -24,13 +24,13 @@ function Menu({
   selectedItem,
   listRef,
   virtualRows,
-  totalHeight
+  totalHeight,
 }) {
   return (
     // apply listRef to ul
     <ul {...getMenuProps({ref: listRef})}>
       {/* li tag with an inline style for the height set to the totalHeight */}
-      <li style={{height: totalHeight}}/>
+      <li style={{height: totalHeight}} />
       {/*
         this is to ensure that the scrollable area of the <ul /> is the
         same height it would be if we were actually rendering everything
@@ -55,8 +55,8 @@ function Menu({
             style={getVirtualRowStyles({size, start})}
             // We need to position each ListItem absolute for it's position
             // to take higher order than the  <li style={{height: totalHeight}}/>
-            // in our ul list in the Menu component. 
-            // Otherwise our items will be at the bottom of the list, 
+            // in our ul list in the Menu component.
+            // Otherwise our items will be at the bottom of the list,
             // positioned after our li with totalHeight style
           >
             {item.name}
@@ -85,7 +85,7 @@ function ListItem({
         style: {
           backgroundColor: isHighlighted ? 'lightgray' : 'inherit',
           fontWeight: isSelected ? 'bold' : 'normal',
-          ...style
+          ...style,
         },
         ...props,
       })}
@@ -106,7 +106,7 @@ function App() {
   // which will be used for the parentRef option you pass to useVirtual
   // and should be applied to the <ul /> for our menu. This is how react-virtual
   // knows how to scroll our items as the user scrolls.
-  const listRef = React.useRef();
+  const listRef = React.useRef()
 
   // userVirtual Hook
   const rowVirtualizer = useVirtual({
@@ -145,7 +145,8 @@ function App() {
     scrollIntoView: () => {},
     // when the highlightedIndex changes, then tell react-virtual to scroll
     // to that index.
-    onHighlightedIndexChange: ({highlightedIndex}) => highlightedIndex !== -1 && rowVirtualizer.scrollToIndex(highlightedIndex),
+    onHighlightedIndexChange: ({highlightedIndex}) =>
+      highlightedIndex !== -1 && rowVirtualizer.scrollToIndex(highlightedIndex),
   })
 
   return (

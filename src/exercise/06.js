@@ -85,9 +85,34 @@ function Grid() {
 }
 Grid = React.memo(Grid)
 
-function Cell({row, column}) {
-  const state = useAppState()
-  const cell = state.grid[row][column]
+/* 
+    Higher Order Component - withStateSlice
+      Takes a component and a function as arguments
+      slice - a function that let us carve out the specific part of the 
+              state we want to retrieve,
+              takes(state, props) as arguments
+        state - retrieved from our global state 
+        props - the props of the Component passed as the first argument 
+    Make sure to spread {...props} in the MemoComponent
+*/
+function withStateSlice(Component, slice) {
+  const MemoComponent = React.memo(Component)
+  // Wrapper goes looking for props and will find it passed by
+  // the Component, JavaScript is beautiful.
+  function Wrapper(props, ref) {
+    const state = useAppState()
+    return <MemoComponent ref={ref} state={slice(state, props)} {...props} />
+  }
+  // Give the HOC a better name in the React dev tools
+  Wrapper.displayName = `withStateSlice(${
+    Component.displayName || Component.name
+  })`
+  return React.memo(Wrapper)
+}
+
+// Thanks to our HOC, withStateSlice, our Cell component will only
+// re-render when the slice of state it cares about changes
+function Cell({state: cell, row, column}) {
   const dispatch = useAppDispatch()
   const handleClick = () => dispatch({type: 'UPDATE_GRID_CELL', row, column})
   return (
@@ -103,7 +128,12 @@ function Cell({row, column}) {
     </button>
   )
 }
-Cell = React.memo(Cell)
+
+Cell = withStateSlice(
+  Cell,
+  // {row, column} is destructured from Cell props
+  (state, {row, column}) => state.grid[row][column],
+)
 
 function DogNameInput() {
   const [dogName, setDogName] = useDogInput()
@@ -136,13 +166,13 @@ function App() {
       <button onClick={forceRerender}>force rerender</button>
       <div>
         {/* Colocate state from Context Providers*/}
-          <DogNameInputProvider>
-            <DogNameInput />
-          </DogNameInputProvider>
-          <AppProvider>
-            <Grid />
-          </AppProvider>
-        </div>
+        <DogNameInputProvider>
+          <DogNameInput />
+        </DogNameInputProvider>
+        <AppProvider>
+          <Grid />
+        </AppProvider>
+      </div>
     </div>
   )
 }

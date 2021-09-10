@@ -6,16 +6,16 @@ import * as React from 'react'
 // What webpack does, or the browser, or another bundler, is that it maintain
 // a cache for all promises made, and the resolved values, by dynamic imports.
 // So when React later goes ahead and loads the component the dynamic import
-// is already in the bundlers, or browsers, cache. 
+// is already in the bundlers, or browsers, cache.
 const loadGlobe = () => import('../globe')
 
-// The import is already in the bundlers, or browsers, cache, when this 
+// The import is already in the bundlers, or browsers, cache, when this
 // is getting rendered to the screen
 const Globe = React.lazy(loadGlobe)
 
 // If we are using webpack we can make use of Magic Comments. This comment will
-// should be used if we are just about 100% about what the next step the user 
-// is going to take will be. 
+// should be used if we are just about 100% about what the next step the user
+// is going to take will be.
 // const Globe = React.lazy(() => import(/* webpackPrefetch: true */ '../globe'))
 
 function App() {

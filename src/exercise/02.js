@@ -60,17 +60,17 @@ function App() {
   const forceRerender = useForceRerender()
   const [inputValue, setInputValue] = React.useState('')
 
-  const {data: allItems, run} = useAsync({data: [], status: 'pending'});
+  const {data: allItems, run} = useAsync({data: [], status: 'pending'})
 
   React.useEffect(() => {
     run(getItems(inputValue))
   }, [inputValue, run])
 
-  // Only re-render when inputValue changes - [inpuValue] dependency. 
+  // Only re-render when inputValue changes - [inpuValue] dependency.
   // const allItems = React.useMemo(() => getItems(inputValue), [inputValue])
   /* switch between allItems and explore the Performance tab in dev tools*/
   // const allItems = getItems(inputValue)
-  
+
   const items = allItems.slice(0, 100)
 
   const {
